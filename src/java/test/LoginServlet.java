@@ -13,8 +13,6 @@ import test.AuthenticationService.AuthenticationException;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
-    private static final long serialVersionUID = 1L;
-    private String cipherAlgorithm;
     private AuthenticationService authenticationService;
 
     @Override
@@ -26,9 +24,9 @@ public class LoginServlet extends HttpServlet {
             String url = config.getInitParameter("DB_url");
             String DBusername = config.getInitParameter("DB_username");
             String DBpassword = config.getInitParameter("DB_password");
-            this.cipherAlgorithm = config.getInitParameter("CIPHER_ALGORITHM");
-            byte[] encryptionKey = config.getInitParameter("ENCRYPTION_KEY").getBytes();
-            this.authenticationService = new AuthenticationService(cipherAlgorithm, encryptionKey, url, DBusername, DBpassword);
+            String cipherAlgorithm = config.getInitParameter("CIPHER_ALGORITHM");
+            String encryptionKey = config.getInitParameter("ENCRYPTION_KEY");
+            authenticationService = new AuthenticationService(cipherAlgorithm, encryptionKey, url, DBusername, DBpassword);
         } catch (ClassNotFoundException e) {
             throw new ServletException("Failed to load JDBC driver", e);
         }

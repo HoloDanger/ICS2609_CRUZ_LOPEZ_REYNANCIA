@@ -27,7 +27,7 @@
         </init-param>
         <init-param>
             <param-name>ENCRYPTION_KEY</param-name>
-            <param-value>IAMGAE</param-value>
+            <param-value>abcdefghijklmnopqrstuvwxyz012345</param-value>
         </init-param>
     </servlet>
     <servlet>
