@@ -21,6 +21,14 @@
             <param-name>DB_url</param-name>
             <param-value>jdbc:derby://localhost:1527/UserDB</param-value>
         </init-param>
+        <init-param>
+            <param-name>CIPHER_ALGORITHM</param-name>
+            <param-value>AES/CBC/PKCS5Padding</param-value>
+        </init-param>
+        <init-param>
+            <param-name>ENCRYPTION_KEY</param-name>
+            <param-value>IAMGAE</param-value>
+        </init-param>
     </servlet>
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
