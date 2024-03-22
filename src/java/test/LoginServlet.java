@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import test.AuthenticationService.AuthenticationException;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -24,9 +23,9 @@ public class LoginServlet extends HttpServlet {
             String url = config.getInitParameter("DB_url");
             String DBusername = config.getInitParameter("DB_username");
             String DBpassword = config.getInitParameter("DB_password");
-            String cipherAlgorithm = config.getInitParameter("CIPHER_ALGORITHM");
-            String encryptionKey = config.getInitParameter("ENCRYPTION_KEY");
-            authenticationService = new AuthenticationService(cipherAlgorithm, encryptionKey, url, DBusername, DBpassword);
+
+            // Initialize AuthenticationService here
+            authenticationService = new AuthenticationService(url, DBusername, DBpassword);
         } catch (ClassNotFoundException e) {
             throw new ServletException("Failed to load JDBC driver", e);
         }
@@ -50,7 +49,7 @@ public class LoginServlet extends HttpServlet {
             }
         } catch (IllegalArgumentException e) {
             response.sendRedirect("noLoginCredentials.jsp");
-        } catch (AuthenticationException e) {
+        } catch (AuthenticationService.AuthenticationException e) {
             response.sendRedirect("authenticationError.jsp");
         } catch (IOException e) {
             response.sendRedirect("error404.jsp");
