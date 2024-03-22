@@ -1,40 +1,29 @@
 package test;
+
 public class User {
-    private String email;
-    private String password;
-    private String role;
+
+    private final String username;
+    private final String password;
+    private final String role;
 
     // Constructor
-    public User(String email, String password, String role) {
-        this.email = email;
+    public User(String username, String password, String role) {
+        this.username = username;
         this.password = password;
         this.role = role;
     }
 
     // Getters and setters
-
     public String getUsername() {
-        return email;
-    }
-
-    public void setUsername(String email) {
-        this.email = email;
+        return username;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getRole() {
         return role;
     }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
-    
 }
