@@ -50,7 +50,13 @@ public class LoginServlet extends HttpServlet {
         } catch (IllegalArgumentException e) {
             response.sendRedirect("noLoginCredentials.jsp");
         } catch (AuthenticationService.AuthenticationException e) {
-            response.sendRedirect("authenticationError.jsp");
+            if (e.getMessage().equals("Invalid username")) {
+                response.sendRedirect("error_1.jsp");
+            } else if (e.getMessage().equals("Invalid password")) {
+                response.sendRedirect("error_2.jsp");
+            } else {
+                response.sendRedirect("error_3.jsp");
+            }
         } catch (IOException e) {
             response.sendRedirect("error404.jsp");
         }
