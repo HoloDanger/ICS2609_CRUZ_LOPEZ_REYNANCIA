@@ -2,6 +2,7 @@ package test;
 
 import java.io.IOException;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -24,8 +25,14 @@ public class LoginServlet extends HttpServlet {
             String dbUsername = config.getInitParameter("DB_username");
             String dbPassword = config.getInitParameter("DB_password");
 
+            // Get the ServletContext object
+            ServletContext servletContext = config.getServletContext();
+
             // Initialize AuthenticationService here
-            authenticationService = new AuthenticationService(url, dbUsername, dbPassword);
+            authenticationService = new AuthenticationService(url, dbUsername, dbPassword, servletContext);
+
+            // Update passwords to encrypted format
+            authenticationService.updatePasswordsToEncrypted(servletContext);
         } catch (ClassNotFoundException e) {
             throw new ServletException("Failed to load JDBC driver", e);
         }

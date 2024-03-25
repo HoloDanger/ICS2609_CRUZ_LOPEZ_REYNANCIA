@@ -21,14 +21,6 @@
             <param-name>DB_url</param-name>
             <param-value>jdbc:derby://localhost:1527/UserDB</param-value>
         </init-param>
-        <init-param>
-            <param-name>CIPHER_ALGORITHM</param-name>
-            <param-value>AES/CBC/PKCS5Padding</param-value>
-        </init-param>
-        <init-param>
-            <param-name>ENCRYPTION_KEY</param-name>
-            <param-value>abcdefghijklmnopqrstuvwxyz012345</param-value>
-        </init-param>
     </servlet>
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
@@ -41,6 +33,16 @@
     <listener>
         <listener-class>test.ContextListener</listener-class>
     </listener>
+    <context-param>
+        <param-name>CIPHER_ALGORITHM</param-name>
+        <param-value>AES/ECB/PKCS5Padding</param-value>
+    </context-param>
+    <context-param>
+        <param-name>ENCRYPTION_KEY</param-name>
+        <param-value>
+            0x74, 0x68, 0x69, 0x73, 0x49, 0x73, 0x41, 0x53, 0x65, 0x63, 0x72, 0x65, 0x74, 0x4b, 0x65, 0x79
+        </param-value>
+    </context-param>
     <servlet-mapping>
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/LogoutServlet</url-pattern>
