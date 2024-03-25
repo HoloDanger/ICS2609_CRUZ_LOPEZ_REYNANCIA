@@ -8,36 +8,36 @@ public class AuthenticationService {
 
     private static final List<User> users = new ArrayList<>();
     private final String url;
-    private final String DB_username;
-    private final String DB_password;
+    private final String dbUsername;
+    private final String dbPassword;
 
-    public AuthenticationService(String url, String DB_username, String DB_password) {
+    public AuthenticationService(String url, String dbUsername, String dbPassword) {
         this.url = url;
-        this.DB_username = DB_username;
-        this.DB_password = DB_password;
+        this.dbUsername = dbUsername;
+        this.dbPassword = dbPassword;
         loadUserData();
     }
 
     private void loadUserData() {
-        try (Connection con = DriverManager.getConnection(url, DB_username, DB_password)) {
+        try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
             String query = "SELECT * FROM USER_INFO ORDER BY username";
 
             try (PreparedStatement ps = con.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    users.add(new User(rs.getString("USERNAME").trim(),
-                            rs.getString("PASSWORD").trim(),
-                            rs.getString("ROLE").trim()));
+                    String username = rs.getString("USERNAME").trim();
+                    String password = rs.getString("PASSWORD").trim();
+                    String role = rs.getString("ROLE").trim();
+                    users.add(new User(username, password, role));
                 }
             }
-        } catch (SQLException sqle) {
-            throw new RuntimeException("Failed to load user data", sqle);
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to load user data", e);
         }
     }
 
-    public User authenticate(String username, String password) throws IllegalArgumentException, AuthenticationException {
-
-        if (username.isEmpty() && password.isEmpty()) {
-            throw new IllegalArgumentException("Username and password cannot be empty");
+    public User authenticate(String username, String password) throws NullValueException, AuthenticationException {
+        if (username == null && password == null || username.isEmpty() && password.isEmpty()) {
+            throw new NullValueException("Username and password cannot be empty");
         }
 
         for (User user : users) {
@@ -56,47 +56,11 @@ public class AuthenticationService {
     }
 
     private boolean isUsernameValid(String username) {
-        for (User user : users) {
-            if (user.getUsername().equals(username)) {
-                return true;
-            }
-        }
-        return false;
+        return users.stream().anyMatch(user -> user.getUsername().equals(username));
     }
 
     private boolean isPasswordValid(String password) {
-
-        if (password == null) {
-            return false;
-        }
-
-        // Check if the password meets the minimum length requirement
-        if (password.length() < 8) {
-            return false;
-        }
-
-        // Check if the password contains at least one uppercase letter
-        if (!password.matches(".*[A-Z].*")) {
-            return false;
-        }
-
-        // Check if the password contains at least one lowercase letter
-        if (!password.matches(".*[a-z].*")) {
-            return false;
-        }
-
-        // Check if the password contains at least one digit
-        if (!password.matches(".*\\d.*")) {
-            return false;
-        }
-
-        // Check if the password contains at least one special character
-        if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
-            return false;
-        }
-
-        // Password meets all the requirements
-        return true;
+        return users.stream().anyMatch(user -> user.getPassword().equals(password));
     }
 
     public static class AuthenticationException extends Exception {
@@ -106,6 +70,17 @@ public class AuthenticationService {
         }
 
         public AuthenticationException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
+
+    public static class NullValueException extends Exception {
+
+        public NullValueException(String message) {
+            super(message);
+        }
+
+        public NullValueException(String message, Throwable cause) {
             super(message, cause);
         }
     }

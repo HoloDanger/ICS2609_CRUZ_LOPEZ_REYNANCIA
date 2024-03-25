@@ -21,11 +21,11 @@ public class LoginServlet extends HttpServlet {
             String driver = config.getInitParameter("DB_driver");
             Class.forName(driver);
             String url = config.getInitParameter("DB_url");
-            String DBusername = config.getInitParameter("DB_username");
-            String DBpassword = config.getInitParameter("DB_password");
+            String dbUsername = config.getInitParameter("DB_username");
+            String dbPassword = config.getInitParameter("DB_password");
 
             // Initialize AuthenticationService here
-            authenticationService = new AuthenticationService(url, DBusername, DBpassword);
+            authenticationService = new AuthenticationService(url, dbUsername, dbPassword);
         } catch (ClassNotFoundException e) {
             throw new ServletException("Failed to load JDBC driver", e);
         }
@@ -44,19 +44,25 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("role", user.getRole());
                 response.sendRedirect("success.jsp");
-            } else {
-                response.sendRedirect("error_3.jsp");
             }
-        } catch (IllegalArgumentException e) {
-            response.sendRedirect("noLoginCredentials.jsp");
         } catch (AuthenticationService.AuthenticationException e) {
-            if (e.getMessage().equals("Invalid username")) {
-                response.sendRedirect("error_1.jsp");
-            } else if (e.getMessage().equals("Invalid password")) {
-                response.sendRedirect("error_2.jsp");
-            } else {
-                response.sendRedirect("error_3.jsp");
+            switch (e.getMessage()) {
+                case "Invalid username":
+                    if (password != null) {
+                        response.sendRedirect("error_3.jsp");
+                    } else {
+                        response.sendRedirect("error_1.jsp");
+                    }
+                    break;
+                case "Invalid password":
+                    response.sendRedirect("error_2.jsp");
+                    break;
+                default:
+                    response.sendRedirect("error_4.jsp");
+                    break;
             }
+        } catch (AuthenticationService.NullValueException e) {
+            response.sendRedirect("noLoginCredentials.jsp");
         } catch (IOException e) {
             response.sendRedirect("error404.jsp");
         }
