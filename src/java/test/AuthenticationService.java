@@ -32,6 +32,9 @@ public class AuthenticationService {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Failed to update passwords", e);
+        } catch (NullPointerException e) {
+            // Log the exception or perform any necessary error handling
+            throw new RuntimeException("NullPointerException occurred while loading user data", e);
         }
     }
 
@@ -49,36 +52,69 @@ public class AuthenticationService {
             String query = "SELECT * FROM USER_INFO ORDER BY username";
 
             try (PreparedStatement ps = con.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
+
                 while (rs.next()) {
-                    String username = rs.getString("USERNAME").trim();
-                    String encryptedPassword = rs.getString("PASSWORD").trim();
-                    String decryptedPassword = Security.decrypt(encryptedPassword, servletContext);
-                    String role = rs.getString("ROLE").trim();
-                    users.add(new User(username, decryptedPassword, role));
+                    String username = null;
+                    String encryptedPassword = null;
+                    String role = null;
+
+                    // Handle potential null values
+                    if (rs.getString("USERNAME") != null) {
+                        username = rs.getString("USERNAME").trim();
+                    }
+                    if (rs.getString("PASSWORD") != null) {
+                        encryptedPassword = rs.getString("PASSWORD").trim();
+                    }
+                    if (rs.getString("ROLE") != null) {
+                        role = rs.getString("ROLE").trim();
+                    }
+
+                    // Decrypt the password
+                    String decryptedPassword = null;
+                    if (encryptedPassword != null) {
+                        decryptedPassword = Security.decrypt(encryptedPassword, servletContext);
+                    }
+
+                    // Create a User object only if username and role are not null
+                    if (username != null && role != null) {
+                        users.add(new User(username, decryptedPassword, role));
+                    } else {
+                        // Log or handle the case when username or role is null
+                        System.out.println("Skipping user record with null username or role");
+                    }
                 }
             }
         } catch (SQLException e) {
+            // Log the exception or perform any necessary error handling
             throw new RuntimeException("Failed to load user data", e);
+        } catch (NullPointerException e) {
+            // Log the exception or perform any necessary error handling
+            throw new RuntimeException("NullPointerException occurred while loading user data", e);
         }
     }
 
     public User authenticate(String username, String password) throws NullValueException, AuthenticationException {
-        if (username == null && password == null || username.isEmpty() && password.isEmpty()) {
-            throw new NullValueException("Username and password cannot be empty");
-        }
-
-        for (User user : users) {
-            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                return user;
+        try {
+            if (username == null && password == null || username.isEmpty() && password.isEmpty()) {
+                throw new NullValueException("Username and password cannot be empty");
             }
-        }
 
-        if (!isUsernameValid(username)) {
-            throw new AuthenticationException("Invalid username");
-        } else if (!isPasswordValid(username, password)) {
-            throw new AuthenticationException("Invalid password");
-        } else {
-            throw new AuthenticationException("Invalid username and password");
+            for (User user : users) {
+                if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                    return user;
+                }
+            }
+
+            if (!isUsernameValid(username)) {
+                throw new AuthenticationException("Invalid username");
+            } else if (!isPasswordValid(username, password)) {
+                throw new AuthenticationException("Invalid password");
+            } else {
+                throw new AuthenticationException("Invalid username and password");
+            }
+        } catch (NullPointerException e) {
+            // Log the exception or perform any necessary error handling
+            throw new AuthenticationException("An error occurred during authentication", e);
         }
     }
 
