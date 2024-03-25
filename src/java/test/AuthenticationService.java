@@ -25,9 +25,10 @@ public class AuthenticationService {
             try (PreparedStatement ps = con.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     String username = rs.getString("USERNAME").trim();
-                    String password = rs.getString("PASSWORD").trim();
+                    String encryptedPassword = rs.getString("PASSWORD").trim();
+                    String decryptedPassword = Security.decrypt(encryptedPassword);
                     String role = rs.getString("ROLE").trim();
-                    users.add(new User(username, password, role));
+                    users.add(new User(username, decryptedPassword, role));
                 }
             }
         } catch (SQLException e) {
