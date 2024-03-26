@@ -31,8 +31,6 @@ public class LoginServlet extends HttpServlet {
             // Initialize AuthenticationService here
             authenticationService = new AuthenticationService(url, dbUsername, dbPassword, servletContext);
 
-            // Update passwords to encrypted format
-            authenticationService.updatePasswordsToEncrypted(servletContext);
         } catch (ClassNotFoundException e) {
             throw new ServletException("Failed to load JDBC driver", e);
         }

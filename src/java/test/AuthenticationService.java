@@ -19,34 +19,6 @@ public class AuthenticationService {
         loadUserData(servletContext);
     }
 
-    public void updatePasswordsToEncrypted(ServletContext servletContext) {
-        try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
-            String query = "SELECT * FROM USER_INFO";
-            try (PreparedStatement ps = con.prepareStatement(query); ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    String username = rs.getString("USERNAME");
-                    String plainTextPassword = rs.getString("PASSWORD");
-                    String encryptedPassword = Security.encrypt(plainTextPassword, servletContext);
-                    updatePassword(con, username, encryptedPassword);
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to update passwords", e);
-        } catch (NullPointerException e) {
-            // Log the exception or perform any necessary error handling
-            throw new RuntimeException("NullPointerException occurred while loading user data", e);
-        }
-    }
-
-    private void updatePassword(Connection con, String username, String encryptedPassword) throws SQLException {
-        String updateQuery = "UPDATE USER_INFO SET PASSWORD = ? WHERE USERNAME = ?";
-        try (PreparedStatement ps = con.prepareStatement(updateQuery)) {
-            ps.setString(1, encryptedPassword);
-            ps.setString(2, username);
-            ps.executeUpdate();
-        }
-    }
-
     private void loadUserData(ServletContext servletContext) {
         try (Connection con = DriverManager.getConnection(url, dbUsername, dbPassword)) {
             String query = "SELECT * FROM USER_INFO ORDER BY username";
