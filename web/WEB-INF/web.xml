@@ -43,10 +43,6 @@
             0123456789abcdef
         </param-value>
     </context-param>
-    <context-param>
-        <param-name>CAPTCHA_LENGTH</param-name>
-        <param-value>6</param-value>
-    </context-param>
     <servlet-mapping>
         <servlet-name>LogoutServlet</servlet-name>
         <url-pattern>/LogoutServlet</url-pattern>
